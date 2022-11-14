@@ -1,7 +1,6 @@
 $(document).ready(function(){
 
     var slideIndex = 0;
-    var stylesCarousel = $('.stylesCarousel');
     var tipsButtons = $('.tipsButtons');
 
     var selectedMedium = null;
@@ -30,29 +29,28 @@ $(document).ready(function(){
         }
     } ).mount();
 
-
     // Filling carousels with cards
     // Mediums
-    for (let i = 0; i < 24; i++) {
-        slideIndex++;
-        mediumCarousel.add('<li class="splide__slide card m-2 border border-5 mediums" id="medium-' + slideIndex + '">' +
-                            '   <img class="card-img-top pe-none" src="images/Mediums/medium (' + slideIndex + ').png"/>' +
+    for (let mediumId in keywords.mediums) {
+        mediumCarousel.add('<li class="splide__slide card m-2 border border-5 mediums">' +
+                            '   <img class="card-img-top pe-none" src="images/Styles/style (' + mediumId + ').png"/>' +
                             '   <div class="card-body">' +
-                            '       <p class="card-text">Medium n°' + slideIndex + '</p>' +
+                            '       <p class="card-text">' + keywords.mediums[mediumId].name + '</p>' +
                             '   </div>' +
+                            '   <div class="mediumId d-none">medium-' + mediumId + '</div>' +
+                            '   <div class="value d-none">' + keywords.mediums[mediumId].value + '</div>' +
                             '</li>');
     }
 
-    slideIndex = 0;
-
     // Styles
-    for (let i = 0; i < 7; i++) {
-        slideIndex++;
-        stylesCarousel.add('<div class="splide__slide card m-2 border border-5 styles" id="style-' + slideIndex + '">' +
-                            '   <img class="card-img-top pe-none" src="images/Styles/style (' + slideIndex + ').png"/>' +
+    for (let styleId in keywords.styles) {
+        stylesCarousel.add('<div class="splide__slide card m-2 border border-5 styles medium-' + keywords.styles[styleId].medium + '" id="style-' + styleId + '">' +
+                            '   <img class="card-img-top pe-none" src="images/Mediums/medium (' + styleId + ').png"/>' +
                             '   <div class="card-body">' +
-                            '       <p class="card-text">Style n°' + slideIndex + '</p>' +
+                            '       <p class="card-text">' + keywords.styles[styleId].name + '</p>' +
                             '   </div>' +
+                            '   <div class="medium-' + keywords.styles[styleId].medium + ' d-none">medium-' + keywords.styles[styleId].medium + '</div>' +
+                            '   <div class="value d-none">' + keywords.styles[styleId].value + '</div>' +
                             '</div>');
     }
 
@@ -68,56 +66,10 @@ $(document).ready(function(){
                             '</label>');
     }
 
-    // Click on Carousel cards handling
-    $('.card').click(function(event) {
-        var div = event.currentTarget;
-        var id = div.id;
-
-        var selectedClass = "border-success";
-
-        // Select Mediums
-        if (id.includes("medium"))
-        {
-            if (!div.className.includes(selectedClass))
-            {
-                if(selectedMedium != null)
-                {
-                    var selectedCard = $('#' + selectedMedium);
-                    selectedCard.removeClass(selectedClass);
-                }
-
-                div.className += ' ' + selectedClass;
-                selectedMedium = id;
-                // Change selected medium aside title of the carousel
-                $('#selectedMedium').text(div.querySelector('.card-text').innerText);
-            }
-        }
-
-        // Select Styles
-        if (id.includes("style"))
-        {
-            var header = $('#selectedStyles');
-
-            // Tests if not already selected
-            if (!div.className.includes(selectedClass))
-            {
-                div.className += ' ' + selectedClass;
-
-                // Add Selected style by title of the carousel
-                header.text(header.text() + ', ' + div.querySelector('.card-text').innerText);
-            }
-            else
-            {
-                div.className = div.className.replace(" " + selectedClass, "");
-
-                // Delete deselected style from title
-                header.text(header.text().replace(', ' + div.querySelector('.card-text').innerText, ''));
-            }
-        }
-    });
-
+    // Click on cards handling
     var selectedClass = "border-success";
 
+    // Select Mediums
     mediumCarousel.on('click', function (Slide) {
         var slideContent = Slide.slide;
         var header = $('#selectedMedium');
@@ -132,11 +84,16 @@ $(document).ready(function(){
 
             slideContent.className += ' ' + selectedClass;
             selectedMedium = slideContent.id;
+
             // Change selected medium aside title of the carousel
-            $('#selectedMedium').text(slideContent.querySelector('.card-text').innerText);
+            header.text(slideContent.querySelector('.card-text').innerText);
+
+            // Filter the styles
+            console.log(stylesCarousel.Components.Slides.filter('.' + slideContent.querySelector('.mediumId').innerText));
         }
     });
 
+    // Select Styles
     stylesCarousel.on('click', function (Slide) {
         var slideContent = Slide.slide;
         var header = $('#selectedStyles');
@@ -190,11 +147,20 @@ $(document).ready(function(){
 function copyPrompt()
 {
     var textPrompt = $('#textPrompt')[0].value;
-    var medium = $('#selectedMedium').text();
-    var styles = $('#selectedStyles').text();
+    var medium = $('.mediums.border-success > .value')[0].innerText;
+    var styles = $('.styles.border-success > .value');
     var tips = $('#selectedTips').text();
 
-    var fullPrompt = '/imagine prompt:' + medium + ' ' + textPrompt + styles + tips;
+    var stylesPromptPart = "";
+
+    console.log(styles)
+
+    styles.each(function(i, style)
+    {
+        stylesPromptPart += ', ' + style.innerText;
+    });
+
+    var fullPrompt = '/imagine prompt:' + medium + ' ' + textPrompt + stylesPromptPart + tips;
 
     navigator.clipboard.writeText(fullPrompt)
         .then(() => {
