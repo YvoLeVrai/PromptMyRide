@@ -1,0 +1,46 @@
+extends layout
+
+block content
+
+  // Text Input
+  .container.fixed-top.pt-6.pb-3.navbar-hidecontent
+    input(placeholder="Enter your idea here")#textPrompt.form-control
+
+  // Main Tool
+  .container.mt-7
+
+    // Carousel Mediums
+    .container.d-flex.flex-row.align-items-end
+      h3.text-white Medium
+      h4#selectedMedium.text-secondary.m-2
+    #carouselMedium.container.splide
+      .splide__track
+        ul.splide__list
+
+    // Carousel Styles
+    .container
+      a(href='#').d-flex.flex-row.align-items-end.text-decoration-none
+        h3.text-white.m-2 Styles
+        i.bi.bi-caret-down-fill.text-white.h5
+        h4#selectedStyles.text-secondary.m-2
+    #carouselStyles.container.splide
+      .splide__track
+        ul.splide__list
+
+    // Tips Buttons
+    .container.d-flex.flex-row.mt-2
+      h3.text-tertiary.me-2 Tips
+      i.bi.bi-lightbulb.text-tertiary.h3
+      h4#selectedTips.text-secondary.m-2
+    .container.mt-2.row.row-cols-auto.tipsButtons
+
+  div.mb-6
+
+  // Copy prompt button
+  nav.navbar.fixed-bottom.navbar-hidecontent.p-4
+    .container.justify-content-center
+      button(onclick="copyPrompt()").btn-lg.btn-success Copy Prompt
+
+block scripts
+  script(src='/js/splide/js/splide.min.js')
+  script(src='/js/promptMakerScript.js')
